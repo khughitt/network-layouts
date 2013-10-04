@@ -1,0 +1,91 @@
+Co-expression Network Layout
+============================
+2013/09/30
+
+Overview
+--------
+
+Setup
+-----
+First, let's convert the edge list that has been formatted for use with
+Cytoscape into a format supported by igraph.
+
+```{r knitr_opts}
+# Knitr defaults
+library(knitr)
+opts_chunk$set(fig.width=12, fig.height=12, fig.dpi=96)
+```
+
+```{r load_graph}
+require(igraph)
+
+# Load graph
+g = read.graph('network.graphml', format='graphml')
+head(V(g)$name)
+head(E(g))
+
+# To speed things up for now, let's limit ourselves to 100 vertices
+num_keep = 2000
+g = g - sample(V(g), length(V(g)) - num_keep)
+
+# Let's remove any isolated vertices
+g = g - names(degree(g)[degree(g) == 0])
+```
+
+First let's try plotting the network using the default layout
+```{r network_plot_default}
+plot(g, vertex.size=2, vertex.label=NA)
+```
+
+Next, let's try plotting the same network but using force-directed layouts.
+
+```{r network_plot_force}
+# Fruchterman-Reingold
+coords = layout.fruchterman.reingold(g, weights=E(g)$weight)
+plot(g, layout=coords, vertex.size=2, vertex.label=NA)
+
+# Kamada-Kawai
+coords2 = layout.kamada.kawai(g, weights=E(g)$weight)
+plot(g, layout=coords2, vertex.size=2, vertex.label=NA)
+```
+
+Next, let's see what the effect of adjusting the edge weights is. Before doing
+that, however, let's first look at the distribution of weights.
+
+```{r edge_weights_orig, fig.height=9}
+hist(E(g)$weight, breaks=15)
+```
+
+From the above histogram, it becomes apparent that the weights are all clustered
+together around 0.6 - 0.65. This is due to the thresholding that was performed
+on the original network data to reduce the number of edges before exporting:
+in that case only edges >= 0.6 were kept.
+
+First, let's try simply spreading the weights out over the range (0,1).
+
+```{r edge_weights_scaled_1, fig.height=9}
+w = E(g)$weight
+
+scaled_weights = (w - min(w)) / (max(w) - min(w))
+hist(scaled_weights, breaks=15)
+```
+
+Let's try using the new scheme on the same force-directed layout method
+above.
+
+```{r force_directed_scaled}
+# Fruchterman-Reingold
+coords3 = layout.fruchterman.reingold(g, weights=scaled_weights)
+plot(g, layout=coords3, vertex.size=2, vertex.label=NA)
+
+coords4 = layout.fruchterman.reingold(g, weights=scaled_weights * 100)
+plot(g, layout=coords4, vertex.size=2, vertex.label=NA)
+
+# Kamada-Kawai
+coords5 = layout.kamada.kawai(g, weights=scaled_weights)
+plot(g, layout=coords5, vertex.size=2, vertex.label=NA)
+
+coords6 = layout.kamada.kawai(g, weights=scaled_weights * 100)
+plot(g, layout=coords6, vertex.size=2, edge.width=0.25, vertex.label=NA)
+```
+
