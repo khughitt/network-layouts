@@ -2,8 +2,42 @@ Co-expression Network Layout
 ============================
 2013/09/30
 
+Status: UNFINISHED
+
+
+```r
+email = "<a href='mailto:khughitt@umd.edu'>Keith Hughitt</a>"
+last_update = format(Sys.time(), "(<time>%Y-%m-%d</time>)")
+cat(paste(email, last_update))
+```
+
+<a href='mailto:khughitt@umd.edu'>Keith Hughitt</a> (<time>2013-11-22</time>)
+
+
+[view source](index.rmd)
+
 Overview
 --------
+The goal of this script is to explore different mechanisms of laying out large
+networks in order to find an appropriate method to display co-expression
+networks.
+
+The main class of layout algorithms currently applied to large-scale networks
+are [force-directed layout algorithms](http://en.wikipedia.org/wiki/Force-directed_graph_drawing)
+in edges and nodes are assigned forces the interactions are modeled after a
+physical system. For instance, edges may be treated as springs attracting nodes
+together, while the nodes themselves are treated as electrically charged
+particles which repulse one another. The network is then allowed to assume an
+energetically favorable configuration which is used as the basis for
+visualization. By varying the parameters of these forces (e.g. spring length 
+and strength, charge strength), different layouts are obtained. Both Cytoscape 
+and igraph include several variations of this algorithm.
+
+To begin with, I will look at several implementations available in igraph:
+
+1. [Fruchterman-Reingold](http://igraph.sourceforge.net/doc/R/layout.html)
+2. [Kamada-Kawai](http://igraph.sourceforge.net/doc/R/layout.html)
+3. [DrL](http://igraph.sourceforge.net/doc/R/layout.drl.html)
 
 Setup
 -----
@@ -11,20 +45,10 @@ First, let's convert the edge list that has been formatted for use with
 Cytoscape into a format supported by igraph.
 
 
-```r
-# Knitr defaults
-library(knitr)
-opts_chunk$set(fig.width = 12, fig.height = 12, fig.dpi = 96)
-
-# igraph defaults
-igraph.options(vertex.size = 2, vertex.label = NA, edge.width = 0.75)
-```
 
 
 
 ```r
-require(igraph)
-
 # Load graph
 g = read.graph("network.graphml", format = "graphml")
 head(V(g)$name)
