@@ -1,14 +1,13 @@
 Co-expression Network Layout
 ============================
-2013/09/30
-
-Status: UNFINISHED
 
 ```{r run_date, results='asis', echo=FALSE}
 email = "<a href='mailto:khughitt@umd.edu'>Keith Hughitt</a>"
 last_update = format(Sys.time(), "(<time>%Y-%m-%d</time>)")
 cat(paste(email, last_update))
 ```
+
+Status: UNFINISHED
 
 [view source](index.rmd)
 
